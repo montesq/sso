@@ -2,5 +2,5 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-POST    /token                     controllers.Token.createToken
+POST    /token                     controllers.Token.giveToken
 GET     /token/:token              controllers.Token.checkToken(token)
