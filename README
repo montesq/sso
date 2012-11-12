@@ -1,4 +1,5 @@
-This is your new Play 2.0 application
-=====================================
+Play SSO Application
+====================
 
-This file will be packaged with your application, when using `play dist`.
+This application is a REST API that aims at centralizing the credentials of your
+ IS application portfolio.

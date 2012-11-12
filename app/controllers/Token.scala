@@ -22,10 +22,10 @@ object Token extends Controller {
   
   val loginForm = Form(
     tuple(
-      "email" -> nonEmptyText,
+      "username" -> nonEmptyText,
       "password" -> nonEmptyText
-    ) verifying ("Invalid email or password", result => result match {
-      case (email, password) => User.authenticate(email, password).isDefined
+    ) verifying ("Invalid username or password", result => result match {
+      case (username, password) => User.authenticate(username, password).isDefined
       }
     )
   )
@@ -34,9 +34,9 @@ object Token extends Controller {
     loginForm.bindFromRequest.fold(
       formWithErrors => BadRequest(formWithErrors.errorsAsJson),
       value => {
-        val (email, password) = value
+        val (username, password) = value
         val toBeCrypted = generate(Map("timestamp"-> System.currentTimeMillis.toString,
-                                       "email"    -> email))
+                                       "username"    -> username))
         val token = AES.encryptAES(toBeCrypted)
         Ok(Json.parse(generate(Map("authToken"-> token)))).withCookies(
           Cookie("authToken", 
@@ -53,10 +53,10 @@ object Token extends Controller {
   
   val tokenValidityForm = Form(
     tuple(
-      "email" -> nonEmptyText,
+      "username" -> nonEmptyText,
       "timestamp" -> longNumber
     ) verifying ("Invalid token", result => result match {
-      case (email, timestamp) => (User.findByEmail(email).isDefined
+      case (username, timestamp) => (User.findByusername(username).isDefined
                                     && timestamp < System.currentTimeMillis
                                     && timestamp > System.currentTimeMillis 
                                        - tokenExpiration)

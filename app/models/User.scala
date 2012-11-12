@@ -6,7 +6,7 @@ import play.api.libs.json._
 import anorm._
 import anorm.SqlParser._
 
-case class User(email: String, password: String)
+case class User(username: String, password: String)
 
 object User {
   
@@ -16,9 +16,9 @@ object User {
    * Parse a User from a ResultSet
    */
   val simple = {
-    get[String]("user.email") ~
+    get[String]("user.username") ~
     get[String]("user.password") map {
-      case email~password => User(email, password)
+      case username~password => User(username, password)
     }
   }
   
@@ -27,15 +27,15 @@ object User {
   /**
    * Authenticate a User.
    */
-  def authenticate(email: String, password: String): Option[User] = {
+  def authenticate(username: String, password: String): Option[User] = {
     DB.withConnection { implicit connection =>
       SQL(
         """
          select * from user where 
-         email = {email} and password = {password}
+         username = {username} and password = {password}
         """
       ).on(
-        'email -> email,
+        'username -> username,
         'password -> password
       ).as(User.simple.singleOpt)
     }
@@ -49,11 +49,11 @@ object User {
       SQL(
         """
           insert into user values (
-            {email}, {password}
+            {username}, {password}
           )
         """
       ).on(
-        'email -> user.email,
+        'username -> user.username,
         'password -> user.password
       ).executeUpdate()
       
@@ -72,33 +72,33 @@ object User {
   }
 
   /**
-   * Retrieve a user based on the email.
+   * Retrieve a user based on the username.
    */
-  def findByEmail(email: String): Option[User] = {
+  def findByusername(username: String): Option[User] = {
     DB.withConnection { implicit connection =>
       SQL(
         """
          select * from user where 
-         email = {email}
+         username = {username}
         """
       ).on(
-        'email -> email
+        'username -> username
       ).as(User.simple.singleOpt)
     }
   }
    
   /**
-   * Delete a user based on the email
+   * Delete a user based on the username
    */
-  def deleteByEmail(email: String): Int = {
+  def deleteByusername(username: String): Int = {
     DB.withConnection { implicit connection =>
       SQL(
         """
          delete * from user where 
-         email = {email}
+         username = {username}
         """
       ).on(
-        'email -> email
+        'username -> username
       ).executeUpdate()
     }
   }

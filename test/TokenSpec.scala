@@ -24,16 +24,16 @@ class TokenSpec extends Specification {
   
   "Response after creating token Action" should {
         
-    "be an error 400 when email doesn't exist in the DB" in {
+    "be an error 400 when username doesn't exist in the DB" in {
       running(FakeApplication()) {
         initDb
         val Some(result) = routeAndCall(FakeRequest(POST, 
                                    "/token", 
                                    FakeHeaders(Map("Content-Type" -> Seq("application/json"))),
-                                   Json.parse(generate(Map("email"    -> "test@test.com",
+                                   Json.parse(generate(Map("username"    -> "test@test.com",
                                                            "password" -> "secret")))))
         status(result) must equalTo(BAD_REQUEST)
-        contentAsString(result) must contain("Invalid email or password")
+        contentAsString(result) must contain("Invalid username or password")
       }
     }
 
@@ -43,10 +43,10 @@ class TokenSpec extends Specification {
         val Some(result) = routeAndCall(FakeRequest(POST, 
                                    "/token", 
                                    FakeHeaders(Map("Content-Type" -> Seq("application/json"))),
-                                   Json.parse(generate(Map("email"    -> "johndoe@world.com",
+                                   Json.parse(generate(Map("username"    -> "johndoe@world.com",
                                                            "password" -> "secret_")))))
         status(result) must equalTo(BAD_REQUEST)
-        contentAsString(result) must contain("Invalid email or password")
+        contentAsString(result) must contain("Invalid username or password")
       }
     }
 
@@ -56,7 +56,7 @@ class TokenSpec extends Specification {
         val Some(result) = routeAndCall(FakeRequest(POST, 
                                    "/token", 
                                    FakeHeaders(Map("Content-Type" -> Seq("application/json"))),
-                                   Json.parse(generate(Map("email"    -> "johndoe@world.com",
+                                   Json.parse(generate(Map("username"    -> "johndoe@world.com",
                                                            "password" -> "secret")))))
          contentAsString(result) must contain("authToken")        
          status(result) must equalTo(OK)
@@ -66,11 +66,11 @@ class TokenSpec extends Specification {
 
   "Response after checking token validity" should {
         
-    "be an error 400 when the email doesn't exist in the db" in {
+    "be an error 400 when the username doesn't exist in the db" in {
       running(FakeApplication()) {
         initDb
         val token = AES.encryptAES(generate(Map("timestamp"-> System.currentTimeMillis.toString,
-                                            "email"    -> "invalidEmail@world.com")))
+                                            "username"    -> "invalidusername@world.com")))
         val Some(result) = routeAndCall(FakeRequest(GET, "/token/" + token))
         status(result) must equalTo(BAD_REQUEST)
       }
@@ -85,7 +85,7 @@ class TokenSpec extends Specification {
                                   case None => 1000 * 60 * 60
                                 }
         val token = AES.encryptAES(generate(Map("timestamp"-> (System.currentTimeMillis - tokenExpiration - 1).toString,
-                                            "email"    -> "johndoe@world.com")))
+                                            "username"    -> "johndoe@world.com")))
         val Some(result) = routeAndCall(FakeRequest(GET, "/token/" + token))
         status(result) must equalTo(BAD_REQUEST)
       }
@@ -95,7 +95,7 @@ class TokenSpec extends Specification {
      running(FakeApplication()) {
         initDb
         val token = AES.encryptAES(generate(Map("timestamp"-> System.currentTimeMillis.toString,
-                                            "email"    -> "johndoe@world.com")))
+                                            "username"    -> "johndoe@world.com")))
         val Some(result) = routeAndCall(FakeRequest(GET, "/token/" + token))
         status(result) must equalTo(OK)
       }
